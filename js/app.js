@@ -126,6 +126,7 @@ const App = {
             this.transactions = Storage.getTransactions();
         }
 
+        this.updateCategoryFilter();
         this.applyFilters();
         this.updateSummary();
         this.updateCharts();
@@ -182,6 +183,7 @@ const App = {
         $('#transactionForm')[0].reset();
         this.setTodayDate();
 
+        this.updateCategoryFilter();
         this.applyFilters();
         this.updateSummary();
         this.updateCharts();
@@ -288,6 +290,27 @@ const App = {
     },
 
     /**
+     * Aktualizace seznamu kategorií ve filtru
+     */
+    updateCategoryFilter() {
+        const categories = [...new Set(this.transactions.map(t => t.category))].sort();
+        const filterCategory = $('#filterCategory');
+        const currentValue = filterCategory.val();
+        
+        // Uložíme aktuální hodnotu
+        filterCategory.html('<option value="">Vše</option>');
+        
+        categories.forEach(category => {
+            filterCategory.append(`<option value="${this.escapeHtml(category)}">${this.escapeHtml(category)}</option>`);
+        });
+        
+        // Obnovíme původní hodnotu pokud existuje
+        if (currentValue && categories.includes(currentValue)) {
+            filterCategory.val(currentValue);
+        }
+    },
+
+    /**
      * Aplikování filtrů
      */
     applyFilters() {
@@ -329,6 +352,7 @@ const App = {
         filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         this.filteredTransactions = filtered;
+        this.updateCategoryFilter();
         this.renderTransactions();
         this.updateCharts();
     },
@@ -375,14 +399,25 @@ const App = {
                         ${amountPrefix}${this.formatAmount(transaction.amount)} Kč
                     </div>
                     <div class="transaction-actions">
-                        <button class="btn btn-secondary" onclick="App.openEditModal('${transaction.id}')">Upravit</button>
-                        <button class="btn btn-danger" onclick="App.deleteTransaction('${transaction.id}')">Smazat</button>
+                        <button class="btn btn-secondary edit-btn" data-id="${this.escapeHtml(transaction.id)}">Upravit</button>
+                        <button class="btn btn-danger delete-btn" data-id="${this.escapeHtml(transaction.id)}">Smazat</button>
                     </div>
                 </div>
             `;
         });
 
         container.html(html);
+        
+        // Nastavení event listenerů pro tlačítka
+        container.find('.edit-btn').on('click', function() {
+            const id = $(this).data('id');
+            App.openEditModal(id);
+        });
+        
+        container.find('.delete-btn').on('click', function() {
+            const id = $(this).data('id');
+            App.deleteTransaction(id);
+        });
     },
 
     /**
