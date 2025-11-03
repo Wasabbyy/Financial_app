@@ -29,7 +29,7 @@ const API = {
             });
             return { success: true, data: response };
         } catch (error) {
-            console.error('Chyba při načítání transakcí:', error);
+            console.error('Error loading transactions:', error);
             return { success: false, error: error.message };
         }
     },
@@ -52,7 +52,7 @@ const API = {
             });
             return { success: true, data: response };
         } catch (error) {
-            console.error('Chyba při přidávání transakce:', error);
+            console.error('Error adding transaction:', error);
             return { success: false, error: error.message };
         }
     },
@@ -75,7 +75,7 @@ const API = {
             });
             return { success: true, data: response };
         } catch (error) {
-            console.error('Chyba při aktualizaci transakce:', error);
+            console.error('Error updating transaction:', error);
             return { success: false, error: error.message };
         }
     },
@@ -96,7 +96,7 @@ const API = {
             });
             return { success: true, data: response };
         } catch (error) {
-            console.error('Chyba při mazání transakce:', error);
+            console.error('Error deleting transaction:', error);
             return { success: false, error: error.message };
         }
     },
@@ -119,7 +119,7 @@ const API = {
             });
             return { success: true, data: response };
         } catch (error) {
-            console.error('Chyba při synchronizaci:', error);
+            console.error('Error synchronizing:', error);
             return { success: false, error: error.message };
         }
     }

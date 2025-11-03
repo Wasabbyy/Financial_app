@@ -1,134 +1,134 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finanční rozpočtář</title>
+    <title>Financial Budget Manager</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>💰 Finanční rozpočtář</h1>
+            <h1>Financial Budget Manager</h1>
             <div class="connection-status" id="connectionStatus">
                 <span class="status-indicator online" id="statusIndicator"></span>
-                <span id="statusText">Připojeno</span>
+                <span id="statusText">Connected</span>
             </div>
         </header>
 
         <main>
-            <!-- Formulář pro přidání transakce -->
+            <!-- Transaction Form -->
             <section class="transaction-form">
-                <h2>Přidat transakci</h2>
+                <h2>Add Transaction</h2>
                 <form id="transactionForm">
                     <div class="form-group">
-                        <label for="amount">Částka (Kč)</label>
-                        <input type="number" id="amount" name="amount" step="0.01" required>
+                        <label for="amount">Amount (CZK)</label>
+                        <input type="number" id="amount" name="amount" step="50" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="type">Typ transakce</label>
+                        <label for="type">Transaction Type</label>
                         <select id="type" name="type" required>
-                            <option value="expense">Výdaj</option>
-                            <option value="income">Příjem</option>
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="category">Kategorie</label>
+                        <label for="category">Category</label>
                         <select id="category" name="category" required>
-                            <option value="">Vyberte kategorii</option>
-                            <option value="Jídlo">Jídlo</option>
-                            <option value="Doprava">Doprava</option>
-                            <option value="Zábava">Zábava</option>
-                            <option value="Ostatní">Ostatní</option>
+                            <option value="">Select category</option>
+                            <option value="Food">Food</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="date">Datum</label>
+                        <label for="date">Date</label>
                         <input type="date" id="date" name="date" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="notes">Poznámka</label>
+                        <label for="notes">Notes</label>
                         <textarea id="notes" name="notes" rows="3"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Přidat transakci</button>
+                    <button type="submit" class="btn btn-primary">Add Transaction</button>
                 </form>
             </section>
 
-            <!-- Filtry a vyhledávání -->
+            <!-- Filters and Search -->
             <section class="filters">
-                <h2>Filtry a vyhledávání</h2>
+                <h2>Filters and Search</h2>
                 <div class="filter-group">
                     <div class="filter-item">
-                        <label for="filterType">Typ:</label>
+                        <label for="filterType">Type:</label>
                         <select id="filterType">
-                            <option value="">Vše</option>
-                            <option value="expense">Výdaj</option>
-                            <option value="income">Příjem</option>
+                            <option value="">All</option>
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
                         </select>
                     </div>
 
                     <div class="filter-item">
-                        <label for="filterCategory">Kategorie:</label>
+                        <label for="filterCategory">Category:</label>
                         <select id="filterCategory">
-                            <option value="">Vše</option>
+                            <option value="">All</option>
                         </select>
                     </div>
 
                     <div class="filter-item">
-                        <label for="filterDateFrom">Od:</label>
+                        <label for="filterDateFrom">From:</label>
                         <input type="date" id="filterDateFrom">
                     </div>
 
                     <div class="filter-item">
-                        <label for="filterDateTo">Do:</label>
+                        <label for="filterDateTo">To:</label>
                         <input type="date" id="filterDateTo">
                     </div>
 
                     <div class="filter-item">
-                        <label for="searchNotes">Hledat v poznámkách:</label>
-                        <input type="text" id="searchNotes" placeholder="Zadejte text...">
+                        <label for="searchNotes">Search in notes:</label>
+                        <input type="text" id="searchNotes" placeholder="Enter text...">
                     </div>
                 </div>
-                <button type="button" class="btn btn-secondary" id="clearFilters">Vymazat filtry</button>
+                <button type="button" class="btn btn-secondary" id="clearFilters">Clear Filters</button>
             </section>
 
-            <!-- Seznam transakcí -->
+            <!-- Transactions List -->
             <section class="transactions">
-                <h2>Transakce</h2>
+                <h2>Transactions</h2>
                 <div class="transactions-summary">
                     <div class="summary-item">
-                        <span class="summary-label">Celkové příjmy:</span>
-                        <span class="summary-value income" id="totalIncome">0 Kč</span>
+                        <span class="summary-label">Total Income:</span>
+                        <span class="summary-value income" id="totalIncome">0 CZK</span>
                     </div>
                     <div class="summary-item">
-                        <span class="summary-label">Celkové výdaje:</span>
-                        <span class="summary-value expense" id="totalExpenses">0 Kč</span>
+                        <span class="summary-label">Total Expenses:</span>
+                        <span class="summary-value expense" id="totalExpenses">0 CZK</span>
                     </div>
                     <div class="summary-item">
-                        <span class="summary-label">Zůstatek:</span>
-                        <span class="summary-value" id="balance">0 Kč</span>
+                        <span class="summary-label">Balance:</span>
+                        <span class="summary-value" id="balance">0 CZK</span>
                     </div>
                 </div>
                 <div id="transactionsList" class="transactions-list">
-                    <p class="empty-message">Žádné transakce. Přidejte první transakci pomocí formuláře výše.</p>
+                    <p class="empty-message">No transactions. Add your first transaction using the form above.</p>
                 </div>
             </section>
 
-            <!-- Statistiky a grafy -->
+            <!-- Statistics and Charts -->
             <section class="statistics">
-                <h2>Statistiky a grafy</h2>
+                <h2>Statistics and Charts</h2>
                 <div class="charts-container">
                     <div class="chart-wrapper">
-                        <h3>Rozložení výdajů podle kategorií</h3>
+                        <h3>Expense Distribution by Category</h3>
                         <canvas id="categoryChart"></canvas>
                     </div>
                     <div class="chart-wrapper">
-                        <h3>Vývoj zůstatku v čase</h3>
+                        <h3>Balance Over Time</h3>
                         <canvas id="balanceChart"></canvas>
                     </div>
                 </div>
@@ -136,51 +136,51 @@
 
             <!-- Export -->
             <section class="export">
-                <h2>Export dat</h2>
+                <h2>Export Data</h2>
                 <div class="export-buttons">
-                    <button type="button" class="btn btn-export" id="exportJSON">Exportovat do JSON</button>
-                    <button type="button" class="btn btn-export" id="exportCSV">Exportovat do CSV</button>
+                    <button type="button" class="btn btn-export" id="exportJSON">Export to JSON</button>
+                    <button type="button" class="btn btn-export" id="exportCSV">Export to CSV</button>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Modální okno pro úpravu transakce -->
+    <!-- Edit Transaction Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Upravit transakci</h2>
+            <h2>Edit Transaction</h2>
             <form id="editForm">
                 <input type="hidden" id="editId">
                 <div class="form-group">
-                    <label for="editAmount">Částka (Kč)</label>
-                    <input type="number" id="editAmount" step="0.01" required>
+                    <label for="editAmount">Amount (CZK)</label>
+                    <input type="number" id="editAmount" step="50" required>
                 </div>
                 <div class="form-group">
-                    <label for="editType">Typ transakce</label>
+                    <label for="editType">Transaction Type</label>
                     <select id="editType" required>
-                        <option value="expense">Výdaj</option>
-                        <option value="income">Příjem</option>
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="editCategory">Kategorie</label>
+                    <label for="editCategory">Category</label>
                     <select id="editCategory" required>
-                        <option value="Jídlo">Jídlo</option>
-                        <option value="Doprava">Doprava</option>
-                        <option value="Zábava">Zábava</option>
-                        <option value="Ostatní">Ostatní</option>
+                        <option value="Food">Food</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="editDate">Datum</label>
+                    <label for="editDate">Date</label>
                     <input type="date" id="editDate" required>
                 </div>
                 <div class="form-group">
-                    <label for="editNotes">Poznámka</label>
+                    <label for="editNotes">Notes</label>
                     <textarea id="editNotes" rows="3"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Uložit změny</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
         </div>
     </div>

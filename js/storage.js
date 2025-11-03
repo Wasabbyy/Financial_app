@@ -16,7 +16,7 @@ const Storage = {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(transactions));
             return true;
         } catch (error) {
-            console.error('Chyba při ukládání do localStorage:', error);
+            console.error('Error saving to localStorage:', error);
             return false;
         }
     },
@@ -29,7 +29,7 @@ const Storage = {
             const data = localStorage.getItem(this.STORAGE_KEY);
             return data ? JSON.parse(data) : [];
         } catch (error) {
-            console.error('Chyba při načítání z localStorage:', error);
+            console.error('Error loading from localStorage:', error);
             return [];
         }
     },
@@ -51,7 +51,7 @@ const Storage = {
             localStorage.setItem(this.PENDING_KEY, JSON.stringify(pending));
             return true;
         } catch (error) {
-            console.error('Chyba při přidávání do pending:', error);
+            console.error('Error adding to pending:', error);
             return false;
         }
     },
@@ -64,7 +64,7 @@ const Storage = {
             const data = localStorage.getItem(this.PENDING_KEY);
             return data ? JSON.parse(data) : [];
         } catch (error) {
-            console.error('Chyba při načítání pending:', error);
+            console.error('Error loading pending:', error);
             return [];
         }
     },
@@ -77,7 +77,7 @@ const Storage = {
             localStorage.removeItem(this.PENDING_KEY);
             return true;
         } catch (error) {
-            console.error('Chyba při mazání pending:', error);
+            console.error('Error clearing pending:', error);
             return false;
         }
     },
@@ -90,7 +90,7 @@ const Storage = {
             localStorage.setItem(this.SYNC_KEY, needed ? 'true' : 'false');
             return true;
         } catch (error) {
-            console.error('Chyba při nastavování sync flag:', error);
+            console.error('Error setting sync flag:', error);
             return false;
         }
     },
@@ -116,7 +116,7 @@ const Storage = {
             localStorage.removeItem(this.SYNC_KEY);
             return true;
         } catch (error) {
-            console.error('Chyba při mazání dat:', error);
+            console.error('Error clearing data:', error);
             return false;
         }
     },

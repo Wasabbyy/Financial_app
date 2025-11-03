@@ -13,6 +13,36 @@ const App = {
      * Inicializace aplikace
      */
     init() {
+        // Načtení stavu filtrů z URL (před nastavením event listenerů)
+        this.loadFiltersFromURL();
+        
+        // Inicializace URL state pro History API (pokud URL neobsahuje parametry)
+        if (!window.location.search) {
+            const state = {
+                filters: {
+                    type: $('#filterType').val() || '',
+                    category: $('#filterCategory').val() || '',
+                    dateFrom: $('#filterDateFrom').val() || '',
+                    dateTo: $('#filterDateTo').val() || '',
+                    search: $('#searchNotes').val() || ''
+                }
+            };
+            window.history.replaceState(state, '', window.location.pathname);
+        } else {
+            // Pokud URL obsahuje parametry, nahradíme state
+            const params = new URLSearchParams(window.location.search);
+            const state = {
+                filters: {
+                    type: params.get('type') || '',
+                    category: params.get('category') || '',
+                    dateFrom: params.get('dateFrom') || '',
+                    dateTo: params.get('dateTo') || '',
+                    search: params.get('search') || ''
+                }
+            };
+            window.history.replaceState(state, '', window.location.href);
+        }
+        
         this.setupEventListeners();
         this.updateConnectionStatus();
         this.setTodayDate();
@@ -27,6 +57,15 @@ const App = {
 
         window.addEventListener('offline', () => {
             this.updateConnectionStatus();
+        });
+
+        // Sledování změn historie prohlížeče (tlačítka zpět/dopředu)
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.filters) {
+                this.loadFiltersFromState(e.state.filters);
+            } else {
+                this.loadFiltersFromURL();
+            }
         });
 
         // Pravidelná kontrola synchronizace (každých 30 sekund)
@@ -47,13 +86,24 @@ const App = {
             this.addTransaction();
         });
 
-        // Filtry
-        $('#filterType, #filterCategory, #filterDateFrom, #filterDateTo, #searchNotes').on('change input', () => {
+        // Filtry - s debouncing pro vyhledávání
+        let filterTimeout;
+        $('#filterType, #filterCategory, #filterDateFrom, #filterDateTo').on('change', () => {
             this.applyFilters();
+            this.saveFiltersToURL();
+        });
+
+        $('#searchNotes').on('input', () => {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                this.applyFilters();
+                this.saveFiltersToURL();
+            }, 300); // Debounce 300ms pro vyhledávání
         });
 
         $('#clearFilters').on('click', () => {
             this.clearFilters();
+            this.clearFiltersFromURL();
         });
 
         // Export
@@ -101,10 +151,10 @@ const App = {
 
         if (isOnline) {
             statusIndicator.removeClass('offline').addClass('online');
-            statusText.text('Připojeno');
+            statusText.text('Connected');
         } else {
             statusIndicator.removeClass('online').addClass('offline');
-            statusText.text('Offline - data ukládána lokálně');
+            statusText.text('Offline - data stored locally');
         }
     },
 
@@ -144,9 +194,9 @@ const App = {
             notes: $('#notes').val() || ''
         };
 
-        // Validace
+        // Validation
         if (!formData.amount || !formData.category || !formData.date) {
-            alert('Prosím vyplňte všechny povinné údaje.');
+            alert('Please fill in all required fields.');
             return;
         }
 
@@ -193,7 +243,7 @@ const App = {
      * Smazání transakce
      */
     async deleteTransaction(id) {
-        if (!confirm('Opravdu chcete smazat tuto transakci?')) {
+        if (!confirm('Are you sure you want to delete this transaction?')) {
             return;
         }
 
@@ -298,7 +348,7 @@ const App = {
         const currentValue = filterCategory.val();
         
         // Uložíme aktuální hodnotu
-        filterCategory.html('<option value="">Vše</option>');
+        filterCategory.html('<option value="">All</option>');
         
         categories.forEach(category => {
             filterCategory.append(`<option value="${this.escapeHtml(category)}">${this.escapeHtml(category)}</option>`);
@@ -376,7 +426,7 @@ const App = {
         const container = $('#transactionsList');
         
         if (this.filteredTransactions.length === 0) {
-            container.html('<p class="empty-message">Žádné transakce neodpovídají zadaným filtrům.</p>');
+            container.html('<p class="empty-message">No transactions match the specified filters.</p>');
             return;
         }
 
@@ -396,11 +446,11 @@ const App = {
                         </div>
                     </div>
                     <div class="transaction-amount ${amountClass}">
-                        ${amountPrefix}${this.formatAmount(transaction.amount)} Kč
+                        ${amountPrefix}${this.formatAmount(transaction.amount)} CZK
                     </div>
                     <div class="transaction-actions">
-                        <button class="btn btn-secondary edit-btn" data-id="${this.escapeHtml(transaction.id)}">Upravit</button>
-                        <button class="btn btn-danger delete-btn" data-id="${this.escapeHtml(transaction.id)}">Smazat</button>
+                        <button class="btn btn-secondary edit-btn" data-id="${this.escapeHtml(transaction.id)}">Edit</button>
+                        <button class="btn btn-danger delete-btn" data-id="${this.escapeHtml(transaction.id)}">Delete</button>
                     </div>
                 </div>
             `;
@@ -434,9 +484,9 @@ const App = {
 
         const balance = income - expenses;
 
-        $('#totalIncome').text(this.formatAmount(income) + ' Kč');
-        $('#totalExpenses').text(this.formatAmount(expenses) + ' Kč');
-        $('#balance').text(this.formatAmount(balance) + ' Kč');
+        $('#totalIncome').text(this.formatAmount(income) + ' CZK');
+        $('#totalExpenses').text(this.formatAmount(expenses) + ' CZK');
+        $('#balance').text(this.formatAmount(balance) + ' CZK');
     },
 
     /**
@@ -479,7 +529,7 @@ const App = {
             data: {
                 labels: [],
                 datasets: [{
-                    label: 'Zůstatek',
+                    label: 'Balance',
                     data: [],
                     borderColor: '#667eea',
                     backgroundColor: 'rgba(102, 126, 234, 0.1)',
@@ -607,7 +657,7 @@ const App = {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `transakce_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `transactions_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
     },
@@ -616,11 +666,11 @@ const App = {
      * Export do CSV
      */
     exportToCSV() {
-        const headers = ['ID', 'Datum', 'Typ', 'Kategorie', 'Částka', 'Poznámka'];
+        const headers = ['ID', 'Date', 'Type', 'Category', 'Amount', 'Notes'];
         const rows = this.transactions.map(t => [
             t.id,
             t.date,
-            t.type === 'income' ? 'Příjem' : 'Výdaj',
+            t.type === 'income' ? 'Income' : 'Expense',
             t.category,
             t.amount,
             (t.notes || '').replace(/"/g, '""')
@@ -635,7 +685,7 @@ const App = {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `transakce_${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     },
@@ -644,7 +694,7 @@ const App = {
      * Pomocné funkce
      */
     formatAmount(amount) {
-        return new Intl.NumberFormat('cs-CZ', {
+        return new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }).format(amount);
@@ -652,13 +702,98 @@ const App = {
 
     formatDate(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleDateString('cs-CZ');
+        return date.toLocaleDateString('en-US');
     },
 
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    },
+
+    /**
+     * URL Management - práce s historie prohlížeče
+     */
+
+    /**
+     * Uložení stavu filtrů do URL
+     */
+    saveFiltersToURL() {
+        const params = new URLSearchParams();
+        
+        const filterType = $('#filterType').val();
+        const filterCategory = $('#filterCategory').val();
+        const filterDateFrom = $('#filterDateFrom').val();
+        const filterDateTo = $('#filterDateTo').val();
+        const searchNotes = $('#searchNotes').val();
+
+        if (filterType) params.set('type', filterType);
+        if (filterCategory) params.set('category', filterCategory);
+        if (filterDateFrom) params.set('dateFrom', filterDateFrom);
+        if (filterDateTo) params.set('dateTo', filterDateTo);
+        if (searchNotes) params.set('search', searchNotes);
+
+        const newURL = params.toString() 
+            ? `${window.location.pathname}?${params.toString()}`
+            : window.location.pathname;
+
+        // Vytvoření state objektu pro History API
+        const state = {
+            filters: {
+                type: filterType || '',
+                category: filterCategory || '',
+                dateFrom: filterDateFrom || '',
+                dateTo: filterDateTo || '',
+                search: searchNotes || ''
+            }
+        };
+
+        // Aktualizace URL bez reloadu stránky
+        window.history.pushState(state, '', newURL);
+    },
+
+    /**
+     * Vymazání filtrů z URL
+     */
+    clearFiltersFromURL() {
+        // Aktualizace URL bez parametrů
+        const newURL = window.location.pathname;
+        const state = { filters: { type: '', category: '', dateFrom: '', dateTo: '', search: '' } };
+        window.history.pushState(state, '', newURL);
+    },
+
+    /**
+     * Načtení stavu filtrů z URL
+     */
+    loadFiltersFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        
+        const type = params.get('type') || '';
+        const category = params.get('category') || '';
+        const dateFrom = params.get('dateFrom') || '';
+        const dateTo = params.get('dateTo') || '';
+        const search = params.get('search') || '';
+
+        $('#filterType').val(type);
+        $('#filterCategory').val(category);
+        $('#filterDateFrom').val(dateFrom);
+        $('#filterDateTo').val(dateTo);
+        $('#searchNotes').val(search);
+    },
+
+    /**
+     * Načtení stavu filtrů z state objektu (pro popstate)
+     */
+    loadFiltersFromState(filters) {
+        $('#filterType').val(filters.type || '');
+        $('#filterCategory').val(filters.category || '');
+        $('#filterDateFrom').val(filters.dateFrom || '');
+        $('#filterDateTo').val(filters.dateTo || '');
+        $('#searchNotes').val(filters.search || '');
+        
+        // Aplikujeme filtry po načtení
+        this.applyFilters();
+        this.updateCategoryFilter();
     }
 };
 

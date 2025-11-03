@@ -1,113 +1,113 @@
-# 💰 Finanční rozpočtář
+# Financial Budget Manager
 
-Webová aplikace pro správu osobních financí - sledování příjmů a výdajů s offline režimem a automatickou synchronizací.
+Web application for personal finance management - tracking income and expenses with offline mode and automatic synchronization.
 
-## 📋 Funkce
+## Features
 
-- ✅ **Záznam příjmů a výdajů** - Přidávání, úprava a mazání transakcí
-- 🔍 **Filtrování a vyhledávání** - Filtrování podle typu, kategorie, data a vyhledávání v poznámkách
-- 📊 **Statistiky a grafy** - Koláčový graf rozložení výdajů a čárový graf vývoje zůstatku
-- 💾 **Offline režim** - Ukládání dat do localStorage při nedostupnosti serveru
-- 🔄 **Automatická synchronizace** - Synchronizace dat po obnovení připojení
-- 📥 **Export dat** - Export do JSON nebo CSV formátu
+- **Income and Expense Recording** - Add, edit, and delete transactions
+- **Filtering and Search** - Filter by type, category, date, and search in notes
+- **Statistics and Charts** - Pie chart of expense distribution and line chart of balance over time
+- **Offline Mode** - Data stored in localStorage when server is unavailable
+- **Automatic Synchronization** - Data syncs after connection is restored
+- **Data Export** - Export to JSON or CSV format
 
-## 🛠️ Technologie
+## Technologies
 
-- **JavaScript (ES6+)** - Hlavní logika aplikace
-- **jQuery 3.7.1** - AJAX požadavky a manipulace s DOM
-- **Chart.js 4.4.0** - Vizualizace dat pomocí grafů
-- **PHP** - REST API server pro ukládání dat
-- **localStorage** - Offline úložiště
-- **HTML5 + CSS3** - Struktura a styling aplikace
+- **JavaScript (ES6+)** - Main application logic
+- **jQuery 3.7.1** - AJAX requests and DOM manipulation
+- **Chart.js 4.4.0** - Data visualization with charts
+- **PHP** - REST API server for data storage
+- **localStorage** - Offline storage
+- **HTML5 + CSS3** - Application structure and styling
 
-## 📁 Struktura projektu
+## Project Structure
 
 ```
 financni-rozpocar/
-├── index.html          # Hlavní HTML soubor
+├── index.html          # Main HTML file
 ├── css/
-│   └── style.css      # Styly aplikace
+│   └── style.css      # Application styles
 ├── js/
-│   ├── app.js         # Hlavní aplikační logika
-│   ├── api.js         # Komunikace s REST API
-│   └── storage.js     # Práce s localStorage
+│   ├── app.js         # Main application logic
+│   ├── api.js         # REST API communication
+│   └── storage.js     # localStorage operations
 ├── api/
 │   ├── index.php      # REST API server
-│   └── data.json      # Datový soubor (vytvoří se automaticky)
-└── README.md          # Dokumentace
+│   └── data.json      # Data file (created automatically)
+└── README.md          # Documentation
 ```
 
-## 🚀 Instalace a spuštění
+## Installation and Running
 
-### Lokální vývoj
+### Local Development
 
-1. **Naklonujte nebo stáhněte projekt**
+1. **Clone or download the project**
 
-2. **Spusťte lokální server**
+2. **Start a local server**
 
-   Pro PHP server můžete použít:
+   For PHP server you can use:
    ```bash
    php -S localhost:8000
    ```
    
-   Nebo použijte jakýkoliv jiný webový server (např. XAMPP, WAMP, nebo Apache/Nginx).
+   Or use any other web server (e.g., XAMPP, WAMP, or Apache/Nginx).
 
-3. **Otevřete aplikaci v prohlížeči**
+3. **Open the application in a browser**
    
    ```
    http://localhost:8000
    ```
 
-### Nasazení na server
+### Server Deployment
 
-1. Nahrát všechny soubory na webový server s podporou PHP (např. eso.vse.cz)
+1. Upload all files to a web server with PHP support (e.g., eso.vse.cz)
 
-2. Ujistěte se, že složka `api/` má oprávnění k zápisu (pro vytvoření `data.json`)
+2. Make sure the `api/` folder has write permissions (for creating `data.json`)
 
-3. Otevřít aplikaci v prohlížeči na adrese vašeho serveru
+3. Open the application in a browser at your server address
 
-## 📖 Použití
+## Usage
 
-### Přidání transakce
+### Adding a Transaction
 
-1. Vyplňte formulář:
-   - Částka (v Kč)
-   - Typ transakce (Příjem/Výdaj)
-   - Kategorie (Jídlo, Doprava, Zábava, Ostatní)
-   - Datum
-   - Poznámka (volitelné)
+1. Fill in the form:
+   - Amount (in CZK, increments of 50)
+   - Transaction Type (Income/Expense)
+   - Category (Food, Transport, Entertainment, Other)
+   - Date
+   - Notes (optional)
 
-2. Klikněte na "Přidat transakci"
+2. Click "Add Transaction"
 
-### Filtrování transakcí
+### Filtering Transactions
 
-- **Typ**: Filtrovat podle příjmu/výdaje
-- **Kategorie**: Filtrovat podle kategorie
-- **Datum**: Filtrovat podle časového rozsahu
-- **Poznámky**: Vyhledávání textu v poznámkách
+- **Type**: Filter by income/expense
+- **Category**: Filter by category
+- **Date**: Filter by date range
+- **Notes**: Search for text in notes
 
-### Offline režim
+### Offline Mode
 
-Aplikace automaticky detekuje nedostupnost serveru:
-- Data se ukládají do localStorage
-- Po obnovení připojení se automaticky synchronizují
-- Indikátor stavu připojení zobrazuje online/offline stav
+The application automatically detects server unavailability:
+- Data is saved to localStorage
+- Automatically synchronizes after connection is restored
+- Connection status indicator shows online/offline status
 
-### Export dat
+### Data Export
 
-- **JSON**: Export všech transakcí do JSON formátu
-- **CSV**: Export transakcí do CSV souboru pro otevření v Excelu
+- **JSON**: Export all transactions to JSON format
+- **CSV**: Export transactions to CSV file for opening in Excel
 
-## 🔧 API Dokumentace
+## API Documentation
 
-API endpointy jsou dostupné na `/api/index.php`:
+API endpoints are available at `/api/index.php`:
 
-### GET - Získání všech transakcí
+### GET - Get All Transactions
 ```
 GET /api/index.php?action=get
 ```
 
-### POST - Přidání transakce
+### POST - Add Transaction
 ```
 POST /api/index.php?action=add
 Content-Type: application/json
@@ -115,30 +115,30 @@ Content-Type: application/json
 {
   "amount": 1000,
   "type": "income",
-  "category": "Jídlo",
+  "category": "Food",
   "date": "2024-11-03",
-  "notes": "Poznámka"
+  "notes": "Note"
 }
 ```
 
-### PUT - Aktualizace transakce
+### PUT - Update Transaction
 ```
 PUT /api/index.php?action=update&id={id}
 Content-Type: application/json
 
 {
   "amount": 1500,
-  "category": "Doprava",
+  "category": "Transport",
   ...
 }
 ```
 
-### DELETE - Smazání transakce
+### DELETE - Delete Transaction
 ```
 DELETE /api/index.php?action=delete&id={id}
 ```
 
-### POST - Synchronizace
+### POST - Synchronization
 ```
 POST /api/index.php?action=sync
 Content-Type: application/json
@@ -148,25 +148,27 @@ Content-Type: application/json
 }
 ```
 
-## 🎨 Vlastnosti
+## Features
 
-- **Responzivní design** - Funguje na desktopu i mobilních zařízeních
-- **Moderní UI** - Čistý a intuitivní uživatelský interface
-- **Automatická synchronizace** - Kontrola každých 30 sekund
-- **Chybové zpracování** - Graceful handling offline stavu
-- **History API ready** - Připraveno pro přidání history managementu
+- **Responsive Design** - Works on desktop and mobile devices
+- **Modern UI** - Clean and intuitive user interface
+- **Automatic Synchronization** - Checks every 30 seconds
+- **Error Handling** - Graceful handling of offline state
+- **History API** - Functional browser history with filter state saved in URL
+  - Share URL with active filters
+  - Functional Back/Forward buttons in browser
+  - Automatic loading of filter state from URL when opening page
 
-## 📝 Poznámky
+## Notes
 
-- Aplikace vyžaduje moderní prohlížeč s podporou ES6+
-- Pro offline funkčnost je potřeba localStorage
-- API server vyžaduje PHP 7.0+
+- Application requires a modern browser with ES6+ support
+- localStorage is required for offline functionality
+- API server requires PHP 7.0+
 
-## 👨‍💻 Autor
+## Author
 
-Projekt vytvořen pro školní úlohu "Webová aplikace v JavaScriptu"
+Project created for school assignment "Web Application in JavaScript"
 
-## 📄 Licence
+## License
 
-Tento projekt je vytvořen pro vzdělávací účely.
-
+This project is created for educational purposes.
