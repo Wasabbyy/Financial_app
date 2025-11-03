@@ -9,6 +9,12 @@ const App = {
     categoryChart: null,
     balanceChart: null,
 
+    // Category definitions by transaction type
+    categories: {
+        expense: ['Food', 'Transport', 'Entertainment', 'Other'],
+        income: ['Salary', 'Gift', 'Selling Old Stuff', 'Other']
+    },
+
     /**
      * Inicializace aplikace
      */
@@ -46,6 +52,8 @@ const App = {
         this.setupEventListeners();
         this.updateConnectionStatus();
         this.setTodayDate();
+        // Initialize categories based on default type
+        this.updateCategories('#category', $('#type').val());
         this.loadTransactions();
         this.initCharts();
 
@@ -84,6 +92,16 @@ const App = {
         $('#transactionForm').on('submit', (e) => {
             e.preventDefault();
             this.addTransaction();
+        });
+
+        // Update categories when transaction type changes
+        $('#type').on('change', () => {
+            this.updateCategories('#category', $('#type').val());
+        });
+
+        // Update categories when edit type changes
+        $('#editType').on('change', () => {
+            this.updateCategories('#editCategory', $('#editType').val());
         });
 
         // Filtry - s debouncing pro vyhledávání
@@ -200,6 +218,12 @@ const App = {
             return;
         }
 
+        // Validate amount is positive
+        if (formData.amount <= 0) {
+            alert('Amount must be a positive number.');
+            return;
+        }
+
         // Přidání ID a timestampu
         const transaction = {
             id: Storage.generateId(),
@@ -232,6 +256,8 @@ const App = {
         // Reset formuláře
         $('#transactionForm')[0].reset();
         this.setTodayDate();
+        // Update categories after reset (type defaults to expense)
+        this.updateCategories('#category', $('#type').val());
 
         this.updateCategoryFilter();
         this.applyFilters();
@@ -276,6 +302,31 @@ const App = {
     },
 
     /**
+     * Update categories dropdown based on transaction type
+     */
+    updateCategories(selectId, type) {
+        const select = $(selectId);
+        const currentValue = select.val();
+        
+        // Clear existing options except the placeholder
+        select.html('<option value="">Select category</option>');
+        
+        // Add categories based on type
+        if (type && this.categories[type]) {
+            this.categories[type].forEach(category => {
+                select.append(`<option value="${category}">${category}</option>`);
+            });
+            
+            // Restore previous value if it exists in the new category list, otherwise clear it
+            if (currentValue && this.categories[type].includes(currentValue)) {
+                select.val(currentValue);
+            } else {
+                select.val(''); // Clear if current category doesn't exist in new list
+            }
+        }
+    },
+
+    /**
      * Otevření modalu pro úpravu transakce
      */
     openEditModal(id) {
@@ -285,9 +336,12 @@ const App = {
         $('#editId').val(transaction.id);
         $('#editAmount').val(transaction.amount);
         $('#editType').val(transaction.type);
-        $('#editCategory').val(transaction.category);
         $('#editDate').val(transaction.date);
         $('#editNotes').val(transaction.notes);
+
+        // Update categories based on transaction type, then set the category value
+        this.updateCategories('#editCategory', transaction.type);
+        $('#editCategory').val(transaction.category);
 
         $('#editModal').show();
     },
@@ -304,6 +358,18 @@ const App = {
             date: $('#editDate').val(),
             notes: $('#editNotes').val() || ''
         };
+
+        // Validation
+        if (!formData.amount || !formData.category || !formData.date) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        // Validate amount is positive
+        if (formData.amount <= 0) {
+            alert('Amount must be a positive number.');
+            return;
+        }
 
         const transactionIndex = this.transactions.findIndex(t => t.id === id);
         if (transactionIndex === -1) return;
